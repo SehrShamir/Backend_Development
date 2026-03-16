@@ -1,11 +1,33 @@
+
 let express = require("express")
 
+require("dotenv").config()
+
+
 let app = express()
+console.log(process.env.myToken)
 
 app.use(express.json())
 let myToken = "12345"
+// let myPass=
 
 let checkToken = (req, res, next) => {
+    if (req.query.token == "" || req.query.token == undefined) {
+        return res.send({
+            status: 0,
+            msg: "please fill the token"
+        })
+    }
+    if (req.query.token != process.env.myToken) {
+        return res.send({
+            status: 0,
+            msg: "please fill the  correct token"
+        })
+    }
+    next();
+}
+app.use(checkToken)  // Middleware
+app.use((req, res, next) => {
     if (req.query.token == "" || req.query.token == undefined) {
         return res.send({
             status: 0,
@@ -19,8 +41,8 @@ let checkToken = (req, res, next) => {
         })
     }
     next();
-}
-app.use(checkToken)  // Middleware
+
+})
 app.get("/", (req, res) => {
     res.send({ status: 1, msg: "HOme Page API" })
 })
@@ -44,4 +66,4 @@ app.post("/login", (req, res) => {
 
 
 
-app.listen("8000")
+app.listen(process.env.PORT || 5000)
